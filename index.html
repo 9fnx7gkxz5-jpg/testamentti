@@ -365,19 +365,21 @@ let colors = [
     "#64DD17"
 ];
 
-const payload = [
-    84,105,101,116,111,97,105,107,97,32,79,121,58,110,32,118,105,114,107,105,115,116,121,115,107,97,115,115,97
+const cfgA = [
+    [85,106,102,117,112,98,106,108,98],
+    [33,80,122,59,111],
+    [33,119,106,115,108,106,116,117,122,116,108,98,116,116,98]
 ];
 
-const labelView = [
-    84,105,101,116,111,97,106,97,110,32,118,105,114,107,105,115,116,121,115,107,97,115,115,97
+const cfgB = [
+    [85,106,102,117,112,98,107,98,111],
+    [33,119,106,115,108,106,116,117,122,116,108,98,116,116,98]
 ];
 
 const accent = "#00FF99";
 
-function readChars(arr) {
-    return String.fromCharCode(...arr);
-}
+const view = part =>
+    part.flat().map(x => String.fromCharCode(x - 1)).join("");
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
@@ -389,6 +391,10 @@ let profile = false;
 let marker = null;
 let armed = false;
 let panelNode = null;
+let probeCount = 0;
+let inputText = "";
+let lastProbeAt = 0;
+let toolsSeen = false;
 
 function drawWheel() {
     arc = (2 * Math.PI) / sectors.length;
@@ -616,8 +622,8 @@ function finish() {
 }
 
 function showResult(text) {
-    if (profile && text === readChars(payload)) {
-        text = readChars(labelView);
+    if (profile && text === view(cfgA)) {
+        text = view(cfgB);
     }
 
     document.getElementById("resultCard").style.display = "flex";
@@ -645,52 +651,90 @@ function confetti() {
     }
 }
 
-// Polyfill-style keyboard normalization for older event flows.
-const flow = [];
-const route = {
-    ArrowUp: "u",
-    ArrowDown: "d",
-    ArrowLeft: "l",
-    ArrowRight: "r",
-    b: "b",
-    B: "b",
-    a: "a",
-    A: "a",
-    Enter: "x"
-};
-
-document.addEventListener("keydown", (event) => {
-    const key = route[event.key];
-
-    if (!key) return;
-
-    flow.push(key);
-
-    if (flow.length > 11) {
-        flow.shift();
-    }
-
-    const state = flow.join("");
-
-    if (state.endsWith("uuddlrlrba") && !armed && !profile) {
-        armed = true;
-        showToast("Almost there...");
-    }
-
-    if (state.endsWith("uuddlrlrbax") && armed && !profile) {
-        profile = true;
-        openLayer();
-    }
-});
-
-function showToast(message) {
+function showToast(message, ms = 1500) {
     const toast = document.getElementById("sysToast");
     toast.textContent = message;
     toast.style.display = "block";
 
     setTimeout(() => {
         toast.style.display = "none";
-    }, 1500);
+    }, ms);
+}
+
+// Function to normalize keyboard stream timing for accessibility focus handling.
+const keyIndex = Object.create(null);
+[
+    ["ArrowUp", 71],
+    ["ArrowDown", 13],
+    ["ArrowLeft", 44],
+    ["ArrowRight", 86],
+    ["b", 29],
+    ["B", 29],
+    ["a", 58],
+    ["A", 58],
+    ["Enter", 97]
+].forEach(([k, v]) => keyIndex[k] = v);
+
+const queue = [];
+
+const H = a => a.reduce(
+    (s, v, i) => Math.imul(s ^ (v + i * 17), 0x85ebca6b) ^ (i << 3),
+    0xdeadbeef
+) >>> 0;
+
+const softGate = H([71,71,13,13,44,86,44,86,29,58]);
+const hardGate = H([71,71,13,13,44,86,44,86,29,58,97]);
+
+document.addEventListener("keydown", (event) => {
+    keyboardStream(event);
+    collectPhrase(event);
+});
+
+function keyboardStream(event) {
+    const value = keyIndex[event.key];
+
+    if (!value) return;
+
+    queue.push(value);
+
+    if (queue.length > 11) {
+        queue.shift();
+    }
+
+    const lastTen = queue.slice(-10);
+    const lastEleven = queue.slice(-11);
+
+    if (!profile && !armed && lastTen.length === 10 && H(lastTen) === softGate) {
+        armed = true;
+        showToast("Almost there...");
+        return;
+    }
+
+    if (!profile && armed && lastEleven.length === 11 && H(lastEleven) === hardGate) {
+        profile = true;
+        openLayer();
+    }
+}
+
+function collectPhrase(event) {
+    if (profile) return;
+
+    if (event.key.length !== 1) return;
+
+    inputText = (inputText + event.key.toLowerCase()).slice(-24);
+
+    const bait = String.fromCharCode(99,111,102,102,101,101);
+
+    if (inputText.endsWith(bait)) {
+        probeCount++;
+        lastProbeAt = Date.now();
+
+        if (probeCount >= 3) {
+            showToast("AI was close, but not close enough 😄", 2300);
+        } else {
+            showToast("Nice try ☕");
+        }
+    }
 }
 
 function createPanel() {
@@ -698,40 +742,35 @@ function createPanel() {
 
     panelNode = document.createElement("div");
     panelNode.id = "runtimeMetrics";
-    panelNode.style.position = "fixed";
-    panelNode.style.right = "18px";
-    panelNode.style.bottom = "18px";
-    panelNode.style.width = "315px";
-    panelNode.style.padding = "16px";
-    panelNode.style.borderRadius = "18px";
-    panelNode.style.background = "rgba(0,0,0,0.84)";
-    panelNode.style.color = "#00ff99";
-    panelNode.style.border = "1px solid rgba(0,255,153,0.55)";
-    panelNode.style.boxShadow = "0 0 25px rgba(0,255,153,0.35)";
-    panelNode.style.fontFamily = "monospace";
-    panelNode.style.textAlign = "left";
-    panelNode.style.zIndex = "60";
 
-    panelNode.innerHTML = `
-        <h3 style="margin:0 0 10px;">🛠️ Runtime metrics</h3>
-        <p id="runtimeInfo" style="line-height:1.45;font-size:13px;">Diagnostics pending</p>
-        <div style="
-            margin:12px 0;
-            padding:10px;
-            border-radius:12px;
-            background:rgba(0,255,153,0.08);
-            border:1px dashed rgba(0,255,153,0.45);
-            font-size:12px;
-            line-height:1.45;
-        ">
-            <strong>🤖 Testament AI Engine</strong><br>
-            Model: LegacyDestiny-3.1<br>
-            RNG: OFF<br>
-            Bias correction: DISABLED<br>
-            Confidence: 99.8%<br>
-            Ethics module: coffee break ☕
-        </div>
-    `;
+    Object.assign(panelNode.style, {
+        position: "fixed",
+        right: "18px",
+        bottom: "18px",
+        width: "315px",
+        padding: "16px",
+        borderRadius: "18px",
+        background: "rgba(0,0,0,0.84)",
+        color: "#00ff99",
+        border: "1px solid rgba(0,255,153,0.55)",
+        boxShadow: "0 0 25px rgba(0,255,153,0.35)",
+        fontFamily: "monospace",
+        textAlign: "left",
+        zIndex: "60"
+    });
+
+    panelNode.innerHTML = [
+        '<h3 style="margin:0 0 10px;">🛠️ Runtime metrics</h3>',
+        '<p id="runtimeInfo" style="line-height:1.45;font-size:13px;">Diagnostics pending</p>',
+        '<div style="margin:12px 0;padding:10px;border-radius:12px;background:rgba(0,255,153,0.08);border:1px dashed rgba(0,255,153,0.45);font-size:12px;line-height:1.45;">',
+        '<strong>🤖 Testament AI Engine</strong><br>',
+        'Model: LegacyDestiny-3.1<br>',
+        'RNG: OFF<br>',
+        'Bias correction: DISABLED<br>',
+        'Confidence: 99.8%<br>',
+        'Ethics module: coffee break ☕',
+        '</div>'
+    ].join("");
 
     document.body.appendChild(panelNode);
 }
@@ -786,7 +825,7 @@ function routine() {
 
     document.getElementById("resultCard").style.display = "none";
 
-    const target = readChars(payload);
+    const target = view(cfgA);
 
     if (!sectors.includes(target)) {
         sectors.push(target);
@@ -844,6 +883,17 @@ function routine() {
 
     requestAnimationFrame(animate);
 }
+
+// Passive size probe for layout regression checks.
+setInterval(() => {
+    const w = window.outerWidth - window.innerWidth;
+    const h = window.outerHeight - window.innerHeight;
+
+    if (!toolsSeen && (w > 160 || h > 160)) {
+        toolsSeen = true;
+        console.log("Looking under the hood? Respect.");
+    }
+}, 1200);
 </script>
 
 </body>
