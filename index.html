@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Testamenttipyörä</title>
+
 <style>
 * { box-sizing: border-box; }
 
@@ -14,9 +15,9 @@ body {
     color: white;
     overflow-x: hidden;
     background:
-        radial-gradient(circle at 20% 20%, rgba(255, 216, 107, 0.28), transparent 25%),
-        radial-gradient(circle at 80% 15%, rgba(255, 65, 108, 0.30), transparent 28%),
-        radial-gradient(circle at 50% 85%, rgba(78, 205, 196, 0.22), transparent 28%),
+        radial-gradient(circle at 20% 20%, rgba(255,216,107,0.28), transparent 25%),
+        radial-gradient(circle at 80% 15%, rgba(255,65,108,0.30), transparent 28%),
+        radial-gradient(circle at 50% 85%, rgba(78,205,196,0.22), transparent 28%),
         linear-gradient(135deg, #170024 0%, #25104a 45%, #090b24 100%);
 }
 
@@ -30,7 +31,9 @@ body::before {
     z-index: -2;
 }
 
-@keyframes lights { to { transform: rotate(360deg); } }
+@keyframes lights {
+    to { transform: rotate(360deg); }
+}
 
 .stage-lights {
     position: fixed;
@@ -50,7 +53,9 @@ body::before {
     to { opacity: 0.65; transform: scale(1.03); }
 }
 
-.hero { padding: 28px 16px 4px; }
+.hero {
+    padding: 28px 16px 4px;
+}
 
 h1 {
     margin: 0;
@@ -280,10 +285,10 @@ button:hover {
     position: fixed;
     right: 18px;
     bottom: 18px;
-    width: 300px;
+    width: 315px;
     padding: 16px;
     border-radius: 18px;
-    background: rgba(0,0,0,0.82);
+    background: rgba(0,0,0,0.84);
     color: #00ff99;
     border: 1px solid rgba(0,255,153,0.55);
     box-shadow: 0 0 25px rgba(0,255,153,0.35);
@@ -302,13 +307,14 @@ button:hover {
     font-size: 13px;
 }
 
-#devPanel select {
-    width: 100%;
-    margin-top: 8px;
-    padding: 8px;
-    border-radius: 8px;
-    border: none;
-    font-family: monospace;
+#aiStats {
+    margin: 12px 0;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(0,255,153,0.08);
+    border: 1px dashed rgba(0,255,153,0.45);
+    font-size: 12px;
+    line-height: 1.45;
 }
 
 #devPanel button {
@@ -376,7 +382,7 @@ button:hover {
         <div class="center-badge"></div>
     </div>
 
-    <button onclick="startShow()">✨ Pyöräytä ✨</button>
+    <button id="mainSpinButton" onclick="handleMainButtonClick()">✨ Pyöräytä ✨</button>
 </div>
 
 <div id="overlay">Testamentti lähtee…</div>
@@ -384,17 +390,21 @@ button:hover {
 <div id="resultCard">
     <div id="resultText"></div>
     <br>
-    <button onclick="location.reload()">Pyöräytä uudelleen</button>
+    <button onclick="closeResult()">Pyöräytä uudelleen</button>
 </div>
 
 <div id="devPanel">
     <h3>🛠️ Developer Mode</h3>
     <p id="devInfo">Debug info</p>
 
-    <label for="cheatSelect">Cheat spin:</label>
-    <select id="cheatSelect"></select>
-
-    <button onclick="cheatSpin()">🎯 Cheat spin</button>
+    <div id="aiStats">
+        <strong>🤖 Testament AI Engine</strong><br>
+        Model: LegacyDestiny-3.1<br>
+        RNG: OFF<br>
+        Bias correction: DISABLED<br>
+        Confidence: 99.8%<br>
+        Ethics module: coffee break ☕
+    </div>
 </div>
 
 <div id="devToast" class="dev-toast">Developer Mode unlocked 🛠️</div>
@@ -436,6 +446,7 @@ let angle = 0;
 let arc = (2 * Math.PI) / sectors.length;
 let isSpinning = false;
 let developerMode = false;
+let highlightedIndex = null;
 
 function drawWheel() {
     arc = (2 * Math.PI) / sectors.length;
@@ -452,15 +463,25 @@ function drawWheel() {
         ctx.fillStyle = colors[i];
         ctx.fill();
 
-        ctx.strokeStyle = "rgba(255,255,255,0.9)";
-        ctx.lineWidth = 4;
-        ctx.stroke();
-
         const gradient = ctx.createRadialGradient(250, 250, 40, 250, 250, 240);
         gradient.addColorStop(0, "rgba(255,255,255,0.28)");
         gradient.addColorStop(1, "rgba(0,0,0,0.12)");
         ctx.fillStyle = gradient;
         ctx.fill();
+
+        ctx.strokeStyle = "rgba(255,255,255,0.9)";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        if (developerMode && highlightedIndex === i) {
+            ctx.save();
+            ctx.shadowColor = "#FFD700";
+            ctx.shadowBlur = 35;
+            ctx.strokeStyle = "#FFD700";
+            ctx.lineWidth = 10;
+            ctx.stroke();
+            ctx.restore();
+        }
 
         ctx.save();
         ctx.translate(250, 250);
@@ -569,8 +590,19 @@ function fanfare() {
     });
 }
 
+function handleMainButtonClick() {
+    if (developerMode) {
+        devSpin();
+    } else {
+        startShow();
+    }
+}
+
 function startShow() {
     if (isSpinning) return;
+
+    highlightedIndex = null;
+    drawWheel();
 
     ensureAudio();
 
@@ -624,11 +656,17 @@ function getWinningIndex() {
 function stop() {
     fanfare();
 
-    document.querySelector(".game-area").classList.remove("shake");
-    void document.querySelector(".game-area").offsetWidth;
-    document.querySelector(".game-area").classList.add("shake");
+    const gameArea = document.querySelector(".game-area");
+    gameArea.classList.remove("shake");
+    void gameArea.offsetWidth;
+    gameArea.classList.add("shake");
 
     const index = getWinningIndex();
+
+    if (developerMode) {
+        highlightedIndex = index;
+        drawWheel();
+    }
 
     setTimeout(() => {
         showResult(sectors[index]);
@@ -637,9 +675,18 @@ function stop() {
 }
 
 function showResult(text) {
+    const extraMessage =
+        developerMode && text === hiddenSector
+            ? "<br><br><span style='font-size:18px;'>Täysin sattumaa. Ei kannata tarkistaa lähdekoodia 😄</span>"
+            : "";
+
     document.getElementById("resultCard").style.display = "flex";
     document.getElementById("resultText").innerHTML =
-        "🎯 Testamenttisi kohde on:<br><b>" + text + "</b>";
+        "🎯 Testamenttisi kohde on:<br><b>" + text + "</b>" + extraMessage;
+}
+
+function closeResult() {
+    document.getElementById("resultCard").style.display = "none";
 }
 
 function confetti() {
@@ -670,9 +717,11 @@ const konamiCode = [
 let konamiIndex = 0;
 
 document.addEventListener("keydown", (e) => {
-    const key = e.key;
+    const key = e.key.toLowerCase();
 
-    if (key === konamiCode[konamiIndex]) {
+    const expectedKey = konamiCode[konamiIndex].toLowerCase();
+
+    if (key === expectedKey) {
         konamiIndex++;
 
         if (konamiIndex === konamiCode.length) {
@@ -692,14 +741,19 @@ function activateDeveloperMode() {
     console.log("%c🛠️ Developer Mode Activated", "color:#00ff99; font-size:18px; font-weight:bold;");
     console.log("Hidden sector unlocked:", hiddenSector);
     console.log("There is no randomness. Only JavaScript.");
+    console.log("%c🎁 Secret reward unlocked", "color:#FFD700; font-size:16px; font-weight:bold;");
+    console.log("You found the thing behind the thing.");
+    console.log("Achievement: Koodarin uteliaisuus +10");
+    console.log("Next mission: pretend this was documented.");
 
     sectors.push(hiddenSector);
     colors.push(hiddenSectorColor);
 
-    drawWheel();
-    populateCheatSelect();
-
+    document.getElementById("mainSpinButton").innerText = "🛠️ Dev spin";
     document.getElementById("devPanel").style.display = "block";
+
+    highlightedIndex = sectors.indexOf(hiddenSector);
+    drawWheel();
 
     const toast = document.getElementById("devToast");
     toast.style.display = "block";
@@ -712,18 +766,6 @@ function activateDeveloperMode() {
     }, 1500);
 
     updateDevInfo();
-}
-
-function populateCheatSelect() {
-    const select = document.getElementById("cheatSelect");
-    select.innerHTML = "";
-
-    sectors.forEach((sector, index) => {
-        const option = document.createElement("option");
-        option.value = index;
-        option.textContent = `${index}: ${sector}`;
-        select.appendChild(option);
-    });
 }
 
 function updateDevInfo() {
@@ -743,17 +785,19 @@ function updateDevInfo() {
     requestAnimationFrame(updateDevInfo);
 }
 
-function cheatSpin() {
+function devSpin() {
     if (!developerMode || isSpinning) return;
 
     ensureAudio();
 
-    const resultCard = document.getElementById("resultCard");
-    resultCard.style.display = "none";
+    document.getElementById("resultCard").style.display = "none";
+
+    highlightedIndex = null;
+    drawWheel();
 
     isSpinning = true;
 
-    const selectedIndex = Number(document.getElementById("cheatSelect").value);
+    const selectedIndex = sectors.indexOf(hiddenSector);
 
     const sectorAngle = 360 / sectors.length;
     const pointerAngle = 270;
