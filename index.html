@@ -20,7 +20,6 @@ body {
         linear-gradient(135deg, #170024 0%, #25104a 45%, #090b24 100%);
 }
 
-/* liikkuva valosumu */
 body::before {
     content: "";
     position: fixed;
@@ -31,11 +30,8 @@ body::before {
     z-index: -2;
 }
 
-@keyframes lights {
-    to { transform: rotate(360deg); }
-}
+@keyframes lights { to { transform: rotate(360deg); } }
 
-/* lavan valopallot */
 .stage-lights {
     position: fixed;
     inset: 0;
@@ -54,17 +50,12 @@ body::before {
     to { opacity: 0.65; transform: scale(1.03); }
 }
 
-.hero {
-    padding: 28px 16px 4px;
-}
+.hero { padding: 28px 16px 4px; }
 
 h1 {
     margin: 0;
     font-size: clamp(34px, 6vw, 68px);
-    letter-spacing: -1px;
-    text-shadow:
-        0 0 12px rgba(255,255,255,0.65),
-        0 0 30px rgba(255,75,43,0.75);
+    text-shadow: 0 0 12px rgba(255,255,255,0.65), 0 0 30px rgba(255,75,43,0.75);
 }
 
 .subtitle {
@@ -74,6 +65,17 @@ h1 {
     opacity: 0.92;
 }
 
+.disclaimer {
+    margin: 14px auto 0;
+    max-width: 760px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
 .game-area {
     width: min(94vw, 760px);
     margin: 22px auto 40px;
@@ -81,9 +83,7 @@ h1 {
     border-radius: 34px;
     background: rgba(255,255,255,0.10);
     border: 1px solid rgba(255,255,255,0.22);
-    box-shadow:
-        0 30px 90px rgba(0,0,0,0.42),
-        inset 0 0 45px rgba(255,255,255,0.06);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.42), inset 0 0 45px rgba(255,255,255,0.06);
     backdrop-filter: blur(10px);
 }
 
@@ -96,22 +96,17 @@ h1 {
     place-items: center;
 }
 
-/* kultainen ulkokehä */
 #wheel-container::before {
     content: "";
     position: absolute;
     width: 104%;
     height: 104%;
     border-radius: 50%;
-    background:
-        conic-gradient(#fff6b7, #f7b733, #fff1a8, #d98b00, #fff6b7);
-    box-shadow:
-        0 0 35px rgba(255,215,0,0.75),
-        0 0 90px rgba(255,65,108,0.28);
+    background: conic-gradient(#fff6b7, #f7b733, #fff1a8, #d98b00, #fff6b7);
+    box-shadow: 0 0 35px rgba(255,215,0,0.75), 0 0 90px rgba(255,65,108,0.28);
     z-index: 0;
 }
 
-/* pienet “lamput” kehällä */
 #wheel-container::after {
     content: "";
     position: absolute;
@@ -145,12 +140,9 @@ canvas {
     height: 100%;
     border-radius: 50%;
     background: white;
-    box-shadow:
-        inset 0 0 22px rgba(0,0,0,0.35),
-        0 18px 55px rgba(0,0,0,0.55);
+    box-shadow: inset 0 0 22px rgba(0,0,0,0.35), 0 18px 55px rgba(0,0,0,0.55);
 }
 
-/* näyttävä neula */
 #pointer {
     position: absolute;
     top: -18px;
@@ -170,18 +162,9 @@ canvas {
     width: min(34vw, 170px);
     height: min(34vw, 170px);
     border-radius: 50%;
-    display: grid;
-    place-items: center;
-    background:
-        radial-gradient(circle at 35% 30%, #fff 0%, #ffe39a 25%, #f7b733 58%, #b76800 100%);
-    color: #261300;
-    font-weight: 900;
-    font-size: clamp(16px, 3vw, 25px);
-    text-shadow: 0 1px 0 rgba(255,255,255,0.75);
+    background: radial-gradient(circle at 35% 30%, #fff 0%, #ffe39a 25%, #f7b733 58%, #b76800 100%);
     border: 5px solid rgba(255,255,255,0.75);
-    box-shadow:
-        0 0 22px rgba(255,215,0,0.8),
-        inset 0 0 18px rgba(255,255,255,0.65);
+    box-shadow: 0 0 22px rgba(255,215,0,0.8), inset 0 0 18px rgba(255,255,255,0.65);
     pointer-events: none;
 }
 
@@ -196,15 +179,7 @@ button {
     color: white;
     border: none;
     border-radius: 999px;
-    box-shadow:
-        0 12px 28px rgba(255,65,108,0.45),
-        0 0 28px rgba(255,204,0,0.35);
-    transition: transform 0.15s ease, filter 0.15s ease;
-}
-
-button:hover {
-    transform: scale(1.06);
-    filter: brightness(1.12);
+    box-shadow: 0 12px 28px rgba(255,65,108,0.45), 0 0 28px rgba(255,204,0,0.35);
 }
 
 @keyframes buttonGlow {
@@ -213,30 +188,19 @@ button:hover {
     100% { background-position: 0% 50%; }
 }
 
-/* SHOW OVERLAY */
 #overlay {
     position: fixed;
     inset: 0;
-    background:
-        radial-gradient(circle, rgba(255,204,0,0.22), rgba(0,0,0,0.92));
+    background: radial-gradient(circle, rgba(255,204,0,0.22), rgba(0,0,0,0.92));
     display: none;
     align-items: center;
     justify-content: center;
     font-size: clamp(38px, 8vw, 90px);
     font-weight: 900;
     z-index: 10;
-    text-shadow:
-        0 0 18px white,
-        0 0 40px #ff416c;
-    animation: overlayPulse 0.8s ease-in-out infinite alternate;
+    text-shadow: 0 0 18px white, 0 0 40px #ff416c;
 }
 
-@keyframes overlayPulse {
-    from { letter-spacing: 0px; transform: scale(1); }
-    to { letter-spacing: 3px; transform: scale(1.04); }
-}
-
-/* RESULT CARD */
 #resultCard {
     position: fixed;
     inset: 0;
@@ -244,23 +208,18 @@ button:hover {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    background:
-        radial-gradient(circle at center, rgba(255,204,0,0.22), rgba(0,0,0,0.92));
+    background: radial-gradient(circle at center, rgba(255,204,0,0.22), rgba(0,0,0,0.92));
     font-size: 28px;
     z-index: 20;
 }
 
 #resultText {
-    background:
-        linear-gradient(135deg, #ffffff, #fff1b8);
+    background: linear-gradient(135deg, #ffffff, #fff1b8);
     color: #1d1230;
     padding: 36px;
     border-radius: 26px;
     width: min(88vw, 620px);
-    box-shadow:
-        0 0 40px rgba(255,215,0,0.8),
-        0 30px 90px rgba(0,0,0,0.65);
-    animation: resultPop 0.55s cubic-bezier(.18,1.55,.32,1);
+    box-shadow: 0 0 40px rgba(255,215,0,0.8), 0 30px 90px rgba(0,0,0,0.65);
 }
 
 #resultText b {
@@ -270,12 +229,6 @@ button:hover {
     color: #ff1744;
 }
 
-@keyframes resultPop {
-    from { transform: scale(0.55) rotate(-4deg); opacity: 0; }
-    to { transform: scale(1) rotate(0deg); opacity: 1; }
-}
-
-/* CONFETTI */
 .confetti {
     position: fixed;
     width: 8px;
@@ -286,14 +239,10 @@ button:hover {
 }
 
 @keyframes fall {
-    to {
-        transform: translateY(105vh) rotate(720deg);
-    }
+    to { transform: translateY(105vh) rotate(720deg); }
 }
 
-.shake {
-    animation: shake 0.35s ease;
-}
+.shake { animation: shake 0.35s ease; }
 
 @keyframes shake {
     0% { transform: translateX(0); }
@@ -302,34 +251,28 @@ button:hover {
     75% { transform: translateX(-4px); }
     100% { transform: translateX(0); }
 }
-
-@media (max-width: 620px) {
-    .game-area {
-        padding: 16px;
-        border-radius: 24px;
-    }
-
-    button {
-        font-size: 18px;
-        padding: 14px 26px;
-    }
-}
 </style>
 </head>
+
 <body>
 
 <div class="stage-lights"></div>
 
 <div class="hero">
     <h1>🎡 Testamenttipyörä</h1>
-    <p class="subtitle">Pyöräytä kohtalon kultainen kiekko ja katso, minne jälkeesi jäävä omaisuus dramaattisesti ohjautuu.</p>
+    <p class="subtitle">
+        Pyöräytä kohtalon kultainen kiekko ja katso, minne jälkeesi jäävä omaisuus dramaattisesti ohjautuu.
+    </p>
+    <p class="disclaimer">
+        Huom. Tämä on humoristinen selainpeli/demo, ei oikeudellinen testamenttiasiakirja tai lahjoitussuositus.
+    </p>
 </div>
 
 <div class="game-area">
     <div id="wheel-container">
         <div id="pointer"></div>
         <canvas id="wheel" width="500" height="500"></canvas>
-        <div class="center-badge">TESTAMENTTI<br>PYÖRÄ</div>
+        <div class="center-badge"></div>
     </div>
 
     <button onclick="startShow()">✨ Pyöräytä ✨</button>
@@ -345,165 +288,199 @@ button:hover {
 
 <script>
 const sectors = [
-"Suomen Punainen Risti","WWF Suomi","Pelastakaa Lapset","Unicef Suomi",
-"Syöpäsäätiö","MLL","Luonnonperintösäätiö",
-"Helsingin Diakonissalaitos","Perussuomalaiset","Vihreät"
+    "Suomen Punainen Risti",
+    "WWF Suomi",
+    "Pelastakaa Lapset",
+    "Unicef Suomi",
+    "Syöpäsäätiö",
+    "Mannerheimin Lastensuojeluliitto",
+    "Luonnonperintösäätiö",
+    "Helsingin Diakonissalaitos",
+    "Perussuomalaiset",
+    "Vihreät"
 ];
 
 const colors = [
-"#FF1744","#00BFA6","#FFD600","#2979FF","#FF9100",
-"#7C4DFF","#00C853","#D500F9","#00B0FF","#64DD17"
+    "#FF1744", "#00BFA6", "#FFD600", "#2979FF", "#FF9100",
+    "#7C4DFF", "#00C853", "#D500F9", "#00B0FF", "#64DD17"
 ];
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
 let angle = 0;
-const arc = (2*Math.PI)/sectors.length;
+const arc = (2 * Math.PI) / sectors.length;
 
 function drawWheel() {
-    ctx.clearRect(0,0,500,500);
+    ctx.clearRect(0, 0, 500, 500);
 
-    for (let i=0;i<sectors.length;i++){
-        let start=i*arc;
+    for (let i = 0; i < sectors.length; i++) {
+        const start = i * arc;
 
         ctx.beginPath();
-        ctx.moveTo(250,250);
-        ctx.arc(250,250,240,start,start+arc);
+        ctx.moveTo(250, 250);
+        ctx.arc(250, 250, 240, start, start + arc);
         ctx.closePath();
-        ctx.fillStyle=colors[i];
+        ctx.fillStyle = colors[i];
         ctx.fill();
 
-        // sektorien valkoinen raja
         ctx.strokeStyle = "rgba(255,255,255,0.9)";
         ctx.lineWidth = 4;
         ctx.stroke();
 
-        // kevyt kiilto
-        const gradient = ctx.createRadialGradient(250,250,40,250,250,240);
-        gradient.addColorStop(0, "rgba(255,255,255,0.28)");
-        gradient.addColorStop(1, "rgba(0,0,0,0.12)");
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        // teksti
         ctx.save();
-        ctx.translate(250,250);
-        ctx.rotate(start+arc/2);
+        ctx.translate(250, 250);
+        ctx.rotate(start + arc / 2);
 
-        ctx.fillStyle="white";
-        ctx.strokeStyle="rgba(0,0,0,0.5)";
-        ctx.lineWidth=4;
-        ctx.font="900 15px Arial";
-        ctx.textAlign="right";
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "rgba(0,0,0,0.58)";
+        ctx.lineWidth = 4;
+        ctx.font = "900 12px Arial";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
 
-        let text = sectors[i];
-        if (text.length > 25) text = text.substring(0,23) + "…";
+        const words = sectors[i].split(" ");
+        const lines = [];
+        let line = "";
 
-        ctx.strokeText(text,220,6);
-        ctx.fillText(text,220,6);
+        words.forEach(word => {
+            const testLine = line ? line + " " + word : word;
+            if (ctx.measureText(testLine).width > 138 && line) {
+                lines.push(line);
+                line = word;
+            } else {
+                line = testLine;
+            }
+        });
+
+        lines.push(line);
+
+        const lineHeight = 14;
+        const startY = -((lines.length - 1) * lineHeight) / 2;
+
+        lines.forEach((lineText, index) => {
+            const y = startY + index * lineHeight;
+            ctx.strokeText(lineText, 222, y);
+            ctx.fillText(lineText, 222, y);
+        });
+
         ctx.restore();
     }
 
-    // sisempi koristekehä
     ctx.beginPath();
-    ctx.arc(250,250,246,0,Math.PI*2);
+    ctx.arc(250, 250, 246, 0, Math.PI * 2);
     ctx.strokeStyle = "rgba(255,255,255,0.85)";
     ctx.lineWidth = 8;
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(250,250,92,0,Math.PI*2);
+    ctx.arc(250, 250, 92, 0, Math.PI * 2);
     ctx.fillStyle = "rgba(255,255,255,0.12)";
     ctx.fill();
 }
+
 drawWheel();
 
-/* SOUND */
 let ctxAudio;
 
-function ensureAudio(){
+function ensureAudio() {
     if (!ctxAudio) {
         ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
     }
 }
 
-function playTick(){
+function playTick() {
     ensureAudio();
+
     const o = ctxAudio.createOscillator();
     const g = ctxAudio.createGain();
+
     o.connect(g);
     g.connect(ctxAudio.destination);
+
     o.frequency.value = 900;
     o.type = "square";
+
     g.gain.setValueAtTime(0.05, ctxAudio.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.045);
+
     o.start();
     o.stop(ctxAudio.currentTime + 0.05);
 }
 
-function fanfare(){
+function fanfare() {
     ensureAudio();
+
     const notes = [523, 659, 784, 1046];
+
     notes.forEach((freq, i) => {
         const o = ctxAudio.createOscillator();
         const g = ctxAudio.createGain();
+
         o.connect(g);
         g.connect(ctxAudio.destination);
+
         o.frequency.value = freq;
         o.type = "triangle";
+
         const t = ctxAudio.currentTime + i * 0.12;
+
         g.gain.setValueAtTime(0.08, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+
         o.start(t);
         o.stop(t + 0.48);
     });
 }
 
-/* SHOW MODE */
-function startShow(){
+function startShow() {
     ensureAudio();
 
     const overlay = document.getElementById("overlay");
-    overlay.style.display="flex";
+    overlay.style.display = "flex";
 
-    setTimeout(()=>{
-        overlay.style.display="none";
+    setTimeout(() => {
+        overlay.style.display = "none";
         spin();
-    },1400);
+    }, 1400);
 }
 
-function spin(){
-    let velocity = 42;
+function spin() {
+    let velocity = 38 + Math.random() * 18;
     let tickCounter = 0;
 
-    function animate(){
+    function animate() {
         velocity *= 0.975;
         angle += velocity;
 
-        canvas.style.transform=`rotate(${angle}deg)`;
+        canvas.style.transform = `rotate(${angle}deg)`;
 
         tickCounter++;
+
         if (tickCounter % Math.max(1, Math.floor(velocity / 6)) === 0) {
             playTick();
         }
 
-        if (velocity>0.45){
+        if (velocity > 0.45) {
             requestAnimationFrame(animate);
         } else {
             stop();
         }
     }
+
     animate();
 }
 
-function stop(){
+function stop() {
     fanfare();
 
     document.querySelector(".game-area").classList.add("shake");
 
-    const final = angle % 360;
-    const index = Math.floor((360-final)/(360/sectors.length))%sectors.length;
+    const normalizedAngle = ((angle % 360) + 360) % 360;
+    const pointerAngle = 270;
+    const sectorAngle = 360 / sectors.length;
+    const winningAngle = (pointerAngle - normalizedAngle + 360) % 360;
+    const index = Math.floor(winningAngle / sectorAngle) % sectors.length;
 
     setTimeout(() => {
         showResult(sectors[index]);
@@ -511,20 +488,22 @@ function stop(){
     }, 450);
 }
 
-function showResult(text){
-    document.getElementById("resultCard").style.display="flex";
+function showResult(text) {
+    document.getElementById("resultCard").style.display = "flex";
     document.getElementById("resultText").innerHTML =
-        "🎯 Testamenttisi kohde on:<br><b>"+text+"</b>";
+        "🎯 Testamenttisi kohde on:<br><b>" + text + "</b>";
 }
 
-function confetti(){
-    for(let i=0;i<140;i++){
-        const c=document.createElement("div");
-        c.className="confetti";
-        c.style.left=Math.random()*100+"vw";
-        c.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
-        c.style.animationDuration=(Math.random()*2.5+2)+"s";
-        c.style.transform=`rotate(${Math.random()*360}deg)`;
+function confetti() {
+    for (let i = 0; i < 140; i++) {
+        const c = document.createElement("div");
+
+        c.className = "confetti";
+        c.style.left = Math.random() * 100 + "vw";
+        c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        c.style.animationDuration = (Math.random() * 2.5 + 2) + "s";
+        c.style.transform = `rotate(${Math.random() * 360}deg)`;
+
         document.body.appendChild(c);
 
         setTimeout(() => c.remove(), 5200);
