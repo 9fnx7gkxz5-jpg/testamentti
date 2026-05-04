@@ -274,42 +274,6 @@ button:hover { transform: scale(1.04); }
     100% { transform: translateX(0); }
 }
 
-#opsPanel {
-    position: fixed;
-    right: 18px;
-    bottom: 18px;
-    width: 315px;
-    padding: 16px;
-    border-radius: 18px;
-    background: rgba(0,0,0,0.84);
-    color: #00ff99;
-    border: 1px solid rgba(0,255,153,0.55);
-    box-shadow: 0 0 25px rgba(0,255,153,0.35);
-    font-family: monospace;
-    text-align: left;
-    display: none;
-    z-index: 60;
-}
-
-#opsPanel h3 {
-    margin: 0 0 10px;
-}
-
-#opsPanel p {
-    line-height: 1.45;
-    font-size: 13px;
-}
-
-#sysStats {
-    margin: 12px 0;
-    padding: 10px;
-    border-radius: 12px;
-    background: rgba(0,255,153,0.08);
-    border: 1px dashed rgba(0,255,153,0.45);
-    font-size: 12px;
-    line-height: 1.45;
-}
-
 .sys-toast {
     position: fixed;
     left: 50%;
@@ -335,12 +299,6 @@ button:hover { transform: scale(1.04); }
     button {
         font-size: 18px;
         padding: 14px 26px;
-    }
-
-    #opsPanel {
-        left: 12px;
-        right: 12px;
-        width: auto;
     }
 }
 </style>
@@ -378,20 +336,6 @@ button:hover { transform: scale(1.04); }
     <button onclick="closeResult()">Pyöräytä uudelleen</button>
 </div>
 
-<div id="opsPanel">
-    <h3>🛠️ Runtime metrics</h3>
-    <p id="opsInfo">Diagnostics pending</p>
-
-    <div id="sysStats">
-        <strong>🤖 Testament AI Engine</strong><br>
-        Model: LegacyDestiny-3.1<br>
-        RNG: OFF<br>
-        Bias correction: DISABLED<br>
-        Confidence: 99.8%<br>
-        Ethics module: coffee break ☕
-    </div>
-</div>
-
 <div id="sysToast" class="sys-toast">Runtime layer unlocked 🛠️</div>
 
 <script>
@@ -425,13 +369,13 @@ const payload = [
     84,105,101,116,111,97,105,107,97,32,79,121,58,110,32,118,105,114,107,105,115,116,121,115,107,97,115,115,97
 ];
 
-const visiblePayload = [
+const labelView = [
     84,105,101,116,111,97,106,97,110,32,118,105,114,107,105,115,116,121,115,107,97,115,115,97
 ];
 
-const markerColor = "#00FF99";
+const accent = "#00FF99";
 
-function decode(arr) {
+function readChars(arr) {
     return String.fromCharCode(...arr);
 }
 
@@ -443,10 +387,11 @@ let arc = (2 * Math.PI) / sectors.length;
 let busy = false;
 let profile = false;
 let marker = null;
+let armed = false;
+let panelNode = null;
 
 function drawWheel() {
     arc = (2 * Math.PI) / sectors.length;
-
     ctx.clearRect(0, 0, 500, 500);
 
     for (let i = 0; i < sectors.length; i++) {
@@ -671,8 +616,8 @@ function finish() {
 }
 
 function showResult(text) {
-    if (profile && text === decode(payload)) {
-        text = decode(visiblePayload);
+    if (profile && text === readChars(payload)) {
+        text = readChars(labelView);
     }
 
     document.getElementById("resultCard").style.display = "flex";
@@ -700,67 +645,138 @@ function confetti() {
     }
 }
 
-const seq = [38,38,40,40,37,39,37,39,66,65];
-let pos = 0;
+// Polyfill-style keyboard normalization for older event flows.
+const flow = [];
+const route = {
+    ArrowUp: "u",
+    ArrowDown: "d",
+    ArrowLeft: "l",
+    ArrowRight: "r",
+    b: "b",
+    B: "b",
+    a: "a",
+    A: "a",
+    Enter: "x"
+};
 
-document.addEventListener("keydown", (e) => {
-    const code = e.keyCode || e.which;
+document.addEventListener("keydown", (event) => {
+    const key = route[event.key];
 
-    if (code === seq[pos]) {
-        pos++;
+    if (!key) return;
 
-        if (pos === seq.length) {
-            openLayer();
-            pos = 0;
-        }
-    } else {
-        pos = 0;
+    flow.push(key);
+
+    if (flow.length > 11) {
+        flow.shift();
+    }
+
+    const state = flow.join("");
+
+    if (state.endsWith("uuddlrlrba") && !armed && !profile) {
+        armed = true;
+        showToast("Almost there...");
+    }
+
+    if (state.endsWith("uuddlrlrbax") && armed && !profile) {
+        profile = true;
+        openLayer();
     }
 });
 
+function showToast(message) {
+    const toast = document.getElementById("sysToast");
+    toast.textContent = message;
+    toast.style.display = "block";
+
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 1500);
+}
+
+function createPanel() {
+    if (panelNode) return;
+
+    panelNode = document.createElement("div");
+    panelNode.id = "runtimeMetrics";
+    panelNode.style.position = "fixed";
+    panelNode.style.right = "18px";
+    panelNode.style.bottom = "18px";
+    panelNode.style.width = "315px";
+    panelNode.style.padding = "16px";
+    panelNode.style.borderRadius = "18px";
+    panelNode.style.background = "rgba(0,0,0,0.84)";
+    panelNode.style.color = "#00ff99";
+    panelNode.style.border = "1px solid rgba(0,255,153,0.55)";
+    panelNode.style.boxShadow = "0 0 25px rgba(0,255,153,0.35)";
+    panelNode.style.fontFamily = "monospace";
+    panelNode.style.textAlign = "left";
+    panelNode.style.zIndex = "60";
+
+    panelNode.innerHTML = `
+        <h3 style="margin:0 0 10px;">🛠️ Runtime metrics</h3>
+        <p id="runtimeInfo" style="line-height:1.45;font-size:13px;">Diagnostics pending</p>
+        <div style="
+            margin:12px 0;
+            padding:10px;
+            border-radius:12px;
+            background:rgba(0,255,153,0.08);
+            border:1px dashed rgba(0,255,153,0.45);
+            font-size:12px;
+            line-height:1.45;
+        ">
+            <strong>🤖 Testament AI Engine</strong><br>
+            Model: LegacyDestiny-3.1<br>
+            RNG: OFF<br>
+            Bias correction: DISABLED<br>
+            Confidence: 99.8%<br>
+            Ethics module: coffee break ☕
+        </div>
+    `;
+
+    document.body.appendChild(panelNode);
+}
+
 function openLayer() {
-    if (profile) return;
-
-    profile = true;
-
     console.log("%cRuntime profile unlocked", "color:#00ff99; font-size:18px; font-weight:bold;");
     console.log("You found the thing behind the thing.");
     console.log("Achievement: Koodarin uteliaisuus +10");
     console.log("Next mission: pretend this was documented.");
 
+    createPanel();
+
     document.getElementById("mainSpinButton").innerText = "🛠️ Dev spin";
-    document.getElementById("opsPanel").style.display = "block";
 
     drawWheel();
 
-    const toast = document.getElementById("sysToast");
-    toast.style.display = "block";
+    showToast("Runtime layer unlocked 🛠️");
 
     document.body.style.filter = "hue-rotate(180deg) contrast(1.18)";
 
     setTimeout(() => {
         document.body.style.filter = "";
-        toast.style.display = "none";
     }, 1500);
 
-    updateOps();
+    updateMetrics();
 }
 
-function updateOps() {
+function updateMetrics() {
     if (!profile) return;
 
     const normalizedAngle = ((angle % 360) + 360) % 360;
     const sectorAngle = 360 / sectors.length;
     const index = getIndex();
+    const el = document.getElementById("runtimeInfo");
 
-    document.getElementById("opsInfo").innerHTML = `
-        Angle: ${normalizedAngle.toFixed(2)}°<br>
-        Sector angle: ${sectorAngle.toFixed(2)}°<br>
-        Current index: ${index}<br>
-        Current sector: [masked]
-    `;
+    if (el) {
+        el.innerHTML = `
+            Angle: ${normalizedAngle.toFixed(2)}°<br>
+            Sector angle: ${sectorAngle.toFixed(2)}°<br>
+            Current index: ${index}<br>
+            Current sector: [masked]
+        `;
+    }
 
-    requestAnimationFrame(updateOps);
+    requestAnimationFrame(updateMetrics);
 }
 
 function routine() {
@@ -770,11 +786,11 @@ function routine() {
 
     document.getElementById("resultCard").style.display = "none";
 
-    const target = decode(payload);
+    const target = readChars(payload);
 
     if (!sectors.includes(target)) {
         sectors.push(target);
-        colors.push(markerColor);
+        colors.push(accent);
     }
 
     marker = null;
