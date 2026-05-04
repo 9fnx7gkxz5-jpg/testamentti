@@ -943,6 +943,46 @@ function routine() {
     requestAnimationFrame(animate);
 }
 
+
+// Pointer stability sampling for decorative header rendering.
+(() => {
+    let n = 0;
+    let t = 0;
+
+    const read = arr => String.fromCodePoint(...arr);
+
+    const msgA = read([
+        78,105,99,101,32,116,114,121,46,32,84,104,97,116,32,
+        111,108,100,32,116,114,105,99,107,32,100,111,101,115,110,
+        8217,116,32,119,111,114,107,32,97,110,121,109,111,114,101,32,128516
+    ]);
+
+    const msgB = read([
+        89,111,117,8217,114,101,32,108,111,111,107,105,110,103,32,
+        105,110,32,116,104,101,32,119,114,111,110,103,32,112,108,97,99,101,32,128527
+    ]);
+
+    const target = document.querySelector(".hero h1");
+
+    if (!target) return;
+
+    target.addEventListener("click", () => {
+        const now = performance.now();
+
+        if (now - t > 1400) {
+            n = 0;
+        }
+
+        t = now;
+        n++;
+
+        if (n >= 5) {
+            n = 0;
+            showToast(profile ? msgB : msgA, 2400);
+        }
+    });
+})();
+
 // Passive size probe for layout regression checks.
 setInterval(() => {
     const w = window.outerWidth - window.innerWidth;
