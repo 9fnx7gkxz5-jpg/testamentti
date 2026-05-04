@@ -395,6 +395,7 @@ let probeCount = 0;
 let inputText = "";
 let lastProbeAt = 0;
 let toolsSeen = false;
+let verifiedEntry = false;
 
 function drawWheel() {
     arc = (2 * Math.PI) / sectors.length;
@@ -711,6 +712,7 @@ function keyboardStream(event) {
     }
 
     if (!profile && armed && lastEleven.length === 11 && H(lastEleven) === hardGate) {
+        verifiedEntry = true;
         profile = true;
         openLayer();
     }
@@ -776,6 +778,11 @@ function createPanel() {
 }
 
 function openLayer() {
+    if (!verifiedEntry) {
+        fakeCrash();
+        return;
+    }
+
     console.log("%cRuntime profile unlocked", "color:#00ff99; font-size:18px; font-weight:bold;");
     console.log("You found the thing behind the thing.");
     console.log("Achievement: Koodarin uteliaisuus +10");
@@ -796,6 +803,58 @@ function openLayer() {
     }, 1500);
 
     updateMetrics();
+}
+
+function fakeCrash() {
+    const screen = document.createElement("div");
+
+    Object.assign(screen.style, {
+        position: "fixed",
+        inset: "0",
+        background: "#0078D7",
+        color: "white",
+        zIndex: "999999",
+        fontFamily: "Segoe UI, Arial, sans-serif",
+        textAlign: "left",
+        padding: "8vh 10vw",
+        cursor: "pointer"
+    });
+
+    screen.innerHTML = [
+        '<div style="font-size:96px;line-height:1;margin-bottom:32px;">:(</div>',
+        '<div style="font-size:28px;max-width:900px;line-height:1.35;">',
+        'Your browser ran into a problem and needs to pretend to restart.',
+        '<br><br>',
+        "We're just collecting some fake error info, and then we'll let you continue.",
+        '</div>',
+        '<div style="margin-top:40px;font-size:18px;line-height:1.6;">',
+        '0% complete<br><br>',
+        'Stop code: CONSOLE_ENTRY_NOT_VERIFIED<br>',
+        'What failed: curiosity.sys',
+        '<br><br>',
+        '<span style="opacity:.8;">Click anywhere or press Esc to recover.</span>',
+        '</div>'
+    ].join("");
+
+    document.body.appendChild(screen);
+
+    const recover = () => {
+        if (screen.parentNode) {
+            screen.remove();
+        }
+
+        showToast("Nice try. Direct console access denied 😄", 2400);
+        document.removeEventListener("keydown", onKey);
+    };
+
+    const onKey = (event) => {
+        if (event.key === "Escape") {
+            recover();
+        }
+    };
+
+    screen.addEventListener("click", recover, { once: true });
+    document.addEventListener("keydown", onKey);
 }
 
 function updateMetrics() {
