@@ -31,9 +31,7 @@ body::before {
     z-index: -2;
 }
 
-@keyframes lights {
-    to { transform: rotate(360deg); }
-}
+@keyframes lights { to { transform: rotate(360deg); } }
 
 .stage-lights {
     position: fixed;
@@ -53,9 +51,7 @@ body::before {
     to { opacity: 0.65; transform: scale(1.03); }
 }
 
-.hero {
-    padding: 28px 16px 4px;
-}
+.hero { padding: 28px 16px 4px; }
 
 h1 {
     margin: 0;
@@ -200,9 +196,7 @@ button {
         0 0 28px rgba(255,204,0,0.35);
 }
 
-button:hover {
-    transform: scale(1.04);
-}
+button:hover { transform: scale(1.04); }
 
 @keyframes buttonGlow {
     0% { background-position: 0% 50%; }
@@ -280,8 +274,8 @@ button:hover {
     100% { transform: translateX(0); }
 }
 
-/* DEV MODE */
-#devPanel {
+/* diagnostics */
+#opsPanel {
     position: fixed;
     right: 18px;
     bottom: 18px;
@@ -298,16 +292,16 @@ button:hover {
     z-index: 60;
 }
 
-#devPanel h3 {
+#opsPanel h3 {
     margin: 0 0 10px;
 }
 
-#devPanel p {
+#opsPanel p {
     line-height: 1.45;
     font-size: 13px;
 }
 
-#aiStats {
+#sysStats {
     margin: 12px 0;
     padding: 10px;
     border-radius: 12px;
@@ -317,15 +311,7 @@ button:hover {
     line-height: 1.45;
 }
 
-#devPanel button {
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 10px;
-}
-
-.dev-toast {
+.sys-toast {
     position: fixed;
     left: 50%;
     bottom: 34px;
@@ -352,7 +338,7 @@ button:hover {
         padding: 14px 26px;
     }
 
-    #devPanel {
+    #opsPanel {
         left: 12px;
         right: 12px;
         width: auto;
@@ -382,7 +368,7 @@ button:hover {
         <div class="center-badge"></div>
     </div>
 
-    <button id="mainSpinButton" onclick="handleMainButtonClick()">✨ Pyöräytä ✨</button>
+    <button id="mainSpinButton" onclick="primaryAction()">✨ Pyöräytä ✨</button>
 </div>
 
 <div id="overlay">Testamentti lähtee…</div>
@@ -393,11 +379,11 @@ button:hover {
     <button onclick="closeResult()">Pyöräytä uudelleen</button>
 </div>
 
-<div id="devPanel">
-    <h3>🛠️ Developer Mode</h3>
-    <p id="devInfo">Debug info</p>
+<div id="opsPanel">
+    <h3>🛠️ System Layer</h3>
+    <p id="opsInfo">Diagnostics pending</p>
 
-    <div id="aiStats">
+    <div id="sysStats">
         <strong>🤖 Testament AI Engine</strong><br>
         Model: LegacyDestiny-3.1<br>
         RNG: OFF<br>
@@ -407,7 +393,7 @@ button:hover {
     </div>
 </div>
 
-<div id="devToast" class="dev-toast">Developer Mode unlocked 🛠️</div>
+<div id="sysToast" class="sys-toast">System layer unlocked 🛠️</div>
 
 <script>
 let sectors = [
@@ -436,17 +422,22 @@ let colors = [
     "#64DD17"
 ];
 
-const hiddenSector = "Tietoaika Oy:n virkistyskassa";
-const hiddenSectorColor = "#00FF99";
+const specialTarget = [
+    "Tietoaika",
+    "Oy:n",
+    "virkistyskassa"
+].join(" ");
+
+const specialColor = "#00FF99";
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
 let angle = 0;
 let arc = (2 * Math.PI) / sectors.length;
-let isSpinning = false;
-let developerMode = false;
-let highlightedIndex = null;
+let active = false;
+let layerOpen = false;
+let markedIndex = null;
 
 function drawWheel() {
     arc = (2 * Math.PI) / sectors.length;
@@ -473,7 +464,7 @@ function drawWheel() {
         ctx.lineWidth = 4;
         ctx.stroke();
 
-        if (developerMode && highlightedIndex === i) {
+        if (layerOpen && markedIndex === i) {
             ctx.save();
             ctx.shadowColor = "#FFD700";
             ctx.shadowBlur = 35;
@@ -538,31 +529,31 @@ function drawWheel() {
 
 drawWheel();
 
-let ctxAudio;
+let audioCtx;
 
 function ensureAudio() {
-    if (!ctxAudio) {
-        ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 }
 
 function playTick() {
     ensureAudio();
 
-    const o = ctxAudio.createOscillator();
-    const g = ctxAudio.createGain();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
 
     o.connect(g);
-    g.connect(ctxAudio.destination);
+    g.connect(audioCtx.destination);
 
     o.frequency.value = 900;
     o.type = "square";
 
-    g.gain.setValueAtTime(0.045, ctxAudio.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.045);
+    g.gain.setValueAtTime(0.045, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.045);
 
     o.start();
-    o.stop(ctxAudio.currentTime + 0.05);
+    o.stop(audioCtx.currentTime + 0.05);
 }
 
 function fanfare() {
@@ -571,16 +562,16 @@ function fanfare() {
     const notes = [523, 659, 784, 1046];
 
     notes.forEach((freq, i) => {
-        const o = ctxAudio.createOscillator();
-        const g = ctxAudio.createGain();
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
 
         o.connect(g);
-        g.connect(ctxAudio.destination);
+        g.connect(audioCtx.destination);
 
         o.frequency.value = freq;
         o.type = "triangle";
 
-        const t = ctxAudio.currentTime + i * 0.12;
+        const t = audioCtx.currentTime + i * 0.12;
 
         g.gain.setValueAtTime(0.08, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
@@ -590,18 +581,18 @@ function fanfare() {
     });
 }
 
-function handleMainButtonClick() {
-    if (developerMode) {
-        devSpin();
+function primaryAction() {
+    if (layerOpen) {
+        runSequence();
     } else {
         startShow();
     }
 }
 
 function startShow() {
-    if (isSpinning) return;
+    if (active) return;
 
-    highlightedIndex = null;
+    markedIndex = null;
     drawWheel();
 
     ensureAudio();
@@ -611,12 +602,12 @@ function startShow() {
 
     setTimeout(() => {
         overlay.style.display = "none";
-        spin();
+        normalSpin();
     }, 1400);
 }
 
-function spin() {
-    isSpinning = true;
+function normalSpin() {
+    active = true;
 
     let velocity = 38 + Math.random() * 18;
     let tickCounter = 0;
@@ -636,15 +627,15 @@ function spin() {
         if (velocity > 0.45) {
             requestAnimationFrame(animate);
         } else {
-            isSpinning = false;
-            stop();
+            active = false;
+            finish();
         }
     }
 
     animate();
 }
 
-function getWinningIndex() {
+function getIndex() {
     const normalizedAngle = ((angle % 360) + 360) % 360;
     const pointerAngle = 270;
     const sectorAngle = 360 / sectors.length;
@@ -653,7 +644,7 @@ function getWinningIndex() {
     return Math.floor(winningAngle / sectorAngle) % sectors.length;
 }
 
-function stop() {
+function finish() {
     fanfare();
 
     const gameArea = document.querySelector(".game-area");
@@ -661,10 +652,10 @@ function stop() {
     void gameArea.offsetWidth;
     gameArea.classList.add("shake");
 
-    const index = getWinningIndex();
+    const index = getIndex();
 
-    if (developerMode) {
-        highlightedIndex = index;
+    if (layerOpen) {
+        markedIndex = index;
         drawWheel();
     }
 
@@ -676,7 +667,7 @@ function stop() {
 
 function showResult(text) {
     const extraMessage =
-        developerMode && text === hiddenSector
+        layerOpen && text === specialTarget
             ? "<br><br><span style='font-size:18px;'>Täysin sattumaa. Ei kannata tarkistaa lähdekoodia 😄</span>"
             : "";
 
@@ -705,57 +696,48 @@ function confetti() {
     }
 }
 
-/* KONAMI CODE + DEV MODE */
-const konamiCode = [
-    "ArrowUp", "ArrowUp",
-    "ArrowDown", "ArrowDown",
-    "ArrowLeft", "ArrowRight",
-    "ArrowLeft", "ArrowRight",
-    "b", "a"
-];
-
-let konamiIndex = 0;
+/*
+  Nothing to see here.
+  Just some perfectly ordinary keyboard handling.
+*/
+const seq = [38,38,40,40,37,39,37,39,66,65];
+let pos = 0;
 
 document.addEventListener("keydown", (e) => {
-    const key = e.key.toLowerCase();
+    const code = e.keyCode || e.which;
 
-    const expectedKey = konamiCode[konamiIndex].toLowerCase();
+    if (code === seq[pos]) {
+        pos++;
 
-    if (key === expectedKey) {
-        konamiIndex++;
-
-        if (konamiIndex === konamiCode.length) {
-            activateDeveloperMode();
-            konamiIndex = 0;
+        if (pos === seq.length) {
+            openSystemLayer();
+            pos = 0;
         }
     } else {
-        konamiIndex = 0;
+        pos = 0;
     }
 });
 
-function activateDeveloperMode() {
-    if (developerMode) return;
+function openSystemLayer() {
+    if (layerOpen) return;
 
-    developerMode = true;
+    layerOpen = true;
 
-    console.log("%c🛠️ Developer Mode Activated", "color:#00ff99; font-size:18px; font-weight:bold;");
-    console.log("Hidden sector unlocked:", hiddenSector);
-    console.log("There is no randomness. Only JavaScript.");
-    console.log("%c🎁 Secret reward unlocked", "color:#FFD700; font-size:16px; font-weight:bold;");
+    console.log("%cSystem layer unlocked", "color:#00ff99; font-size:18px; font-weight:bold;");
     console.log("You found the thing behind the thing.");
     console.log("Achievement: Koodarin uteliaisuus +10");
     console.log("Next mission: pretend this was documented.");
 
-    sectors.push(hiddenSector);
-    colors.push(hiddenSectorColor);
+    sectors.push(specialTarget);
+    colors.push(specialColor);
 
     document.getElementById("mainSpinButton").innerText = "🛠️ Dev spin";
-    document.getElementById("devPanel").style.display = "block";
+    document.getElementById("opsPanel").style.display = "block";
 
-    highlightedIndex = sectors.indexOf(hiddenSector);
+    markedIndex = sectors.indexOf(specialTarget);
     drawWheel();
 
-    const toast = document.getElementById("devToast");
+    const toast = document.getElementById("sysToast");
     toast.style.display = "block";
 
     document.body.style.filter = "hue-rotate(180deg) contrast(1.18)";
@@ -765,39 +747,39 @@ function activateDeveloperMode() {
         toast.style.display = "none";
     }, 1500);
 
-    updateDevInfo();
+    updateOps();
 }
 
-function updateDevInfo() {
-    if (!developerMode) return;
+function updateOps() {
+    if (!layerOpen) return;
 
     const normalizedAngle = ((angle % 360) + 360) % 360;
     const sectorAngle = 360 / sectors.length;
-    const index = getWinningIndex();
+    const index = getIndex();
 
-    document.getElementById("devInfo").innerHTML = `
+    document.getElementById("opsInfo").innerHTML = `
         Angle: ${normalizedAngle.toFixed(2)}°<br>
         Sector angle: ${sectorAngle.toFixed(2)}°<br>
         Current index: ${index}<br>
         Current sector:<br><strong>${sectors[index]}</strong>
     `;
 
-    requestAnimationFrame(updateDevInfo);
+    requestAnimationFrame(updateOps);
 }
 
-function devSpin() {
-    if (!developerMode || isSpinning) return;
+function runSequence() {
+    if (!layerOpen || active) return;
 
     ensureAudio();
 
     document.getElementById("resultCard").style.display = "none";
 
-    highlightedIndex = null;
+    markedIndex = null;
     drawWheel();
 
-    isSpinning = true;
+    active = true;
 
-    const selectedIndex = sectors.indexOf(hiddenSector);
+    const selectedIndex = sectors.indexOf(specialTarget);
 
     const sectorAngle = 360 / sectors.length;
     const pointerAngle = 270;
@@ -836,8 +818,8 @@ function devSpin() {
         if (progress < 1) {
             requestAnimationFrame(animate);
         } else {
-            isSpinning = false;
-            stop();
+            active = false;
+            finish();
         }
     }
 
