@@ -274,7 +274,6 @@ button:hover { transform: scale(1.04); }
     100% { transform: translateX(0); }
 }
 
-/* diagnostics */
 #opsPanel {
     position: fixed;
     right: 18px;
@@ -380,7 +379,7 @@ button:hover { transform: scale(1.04); }
 </div>
 
 <div id="opsPanel">
-    <h3>🛠️ System Layer</h3>
+    <h3>🛠️ Runtime metrics</h3>
     <p id="opsInfo">Diagnostics pending</p>
 
     <div id="sysStats">
@@ -393,7 +392,7 @@ button:hover { transform: scale(1.04); }
     </div>
 </div>
 
-<div id="sysToast" class="sys-toast">System layer unlocked 🛠️</div>
+<div id="sysToast" class="sys-toast">Runtime layer unlocked 🛠️</div>
 
 <script>
 let sectors = [
@@ -422,22 +421,28 @@ let colors = [
     "#64DD17"
 ];
 
-const specialTarget = [
-    "Tietoaika",
-    "Oy:n",
-    "virkistyskassa"
-].join(" ");
+const payload = [
+    84,105,101,116,111,97,105,107,97,32,79,121,58,110,32,118,105,114,107,105,115,116,121,115,107,97,115,115,97
+];
 
-const specialColor = "#00FF99";
+const visiblePayload = [
+    84,105,101,116,111,97,106,97,110,32,118,105,114,107,105,115,116,121,115,107,97,115,115,97
+];
+
+const markerColor = "#00FF99";
+
+function decode(arr) {
+    return String.fromCharCode(...arr);
+}
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
 let angle = 0;
 let arc = (2 * Math.PI) / sectors.length;
-let active = false;
-let layerOpen = false;
-let markedIndex = null;
+let busy = false;
+let profile = false;
+let marker = null;
 
 function drawWheel() {
     arc = (2 * Math.PI) / sectors.length;
@@ -464,7 +469,7 @@ function drawWheel() {
         ctx.lineWidth = 4;
         ctx.stroke();
 
-        if (layerOpen && markedIndex === i) {
+        if (profile && marker === i) {
             ctx.save();
             ctx.shadowColor = "#FFD700";
             ctx.shadowBlur = 35;
@@ -582,17 +587,17 @@ function fanfare() {
 }
 
 function primaryAction() {
-    if (layerOpen) {
-        runSequence();
+    if (profile) {
+        routine();
     } else {
         startShow();
     }
 }
 
 function startShow() {
-    if (active) return;
+    if (busy) return;
 
-    markedIndex = null;
+    marker = null;
     drawWheel();
 
     ensureAudio();
@@ -607,7 +612,7 @@ function startShow() {
 }
 
 function normalSpin() {
-    active = true;
+    busy = true;
 
     let velocity = 38 + Math.random() * 18;
     let tickCounter = 0;
@@ -627,7 +632,7 @@ function normalSpin() {
         if (velocity > 0.45) {
             requestAnimationFrame(animate);
         } else {
-            active = false;
+            busy = false;
             finish();
         }
     }
@@ -654,8 +659,8 @@ function finish() {
 
     const index = getIndex();
 
-    if (layerOpen) {
-        markedIndex = index;
+    if (profile) {
+        marker = index;
         drawWheel();
     }
 
@@ -666,14 +671,13 @@ function finish() {
 }
 
 function showResult(text) {
-    const extraMessage =
-        layerOpen && text === specialTarget
-            ? "<br><br><span style='font-size:18px;'>Täysin sattumaa. Ei kannata tarkistaa lähdekoodia 😄</span>"
-            : "";
+    if (profile && text === decode(payload)) {
+        text = decode(visiblePayload);
+    }
 
     document.getElementById("resultCard").style.display = "flex";
     document.getElementById("resultText").innerHTML =
-        "🎯 Testamenttisi kohde on:<br><b>" + text + "</b>" + extraMessage;
+        "🎯 Testamenttisi kohde on:<br><b>" + text + "</b>";
 }
 
 function closeResult() {
@@ -696,10 +700,6 @@ function confetti() {
     }
 }
 
-/*
-  Nothing to see here.
-  Just some perfectly ordinary keyboard handling.
-*/
 const seq = [38,38,40,40,37,39,37,39,66,65];
 let pos = 0;
 
@@ -710,7 +710,7 @@ document.addEventListener("keydown", (e) => {
         pos++;
 
         if (pos === seq.length) {
-            openSystemLayer();
+            openLayer();
             pos = 0;
         }
     } else {
@@ -718,23 +718,19 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-function openSystemLayer() {
-    if (layerOpen) return;
+function openLayer() {
+    if (profile) return;
 
-    layerOpen = true;
+    profile = true;
 
-    console.log("%cSystem layer unlocked", "color:#00ff99; font-size:18px; font-weight:bold;");
+    console.log("%cRuntime profile unlocked", "color:#00ff99; font-size:18px; font-weight:bold;");
     console.log("You found the thing behind the thing.");
     console.log("Achievement: Koodarin uteliaisuus +10");
     console.log("Next mission: pretend this was documented.");
 
-    sectors.push(specialTarget);
-    colors.push(specialColor);
-
     document.getElementById("mainSpinButton").innerText = "🛠️ Dev spin";
     document.getElementById("opsPanel").style.display = "block";
 
-    markedIndex = sectors.indexOf(specialTarget);
     drawWheel();
 
     const toast = document.getElementById("sysToast");
@@ -751,7 +747,7 @@ function openSystemLayer() {
 }
 
 function updateOps() {
-    if (!layerOpen) return;
+    if (!profile) return;
 
     const normalizedAngle = ((angle % 360) + 360) % 360;
     const sectorAngle = 360 / sectors.length;
@@ -761,25 +757,32 @@ function updateOps() {
         Angle: ${normalizedAngle.toFixed(2)}°<br>
         Sector angle: ${sectorAngle.toFixed(2)}°<br>
         Current index: ${index}<br>
-        Current sector:<br><strong>${sectors[index]}</strong>
+        Current sector: [masked]
     `;
 
     requestAnimationFrame(updateOps);
 }
 
-function runSequence() {
-    if (!layerOpen || active) return;
+function routine() {
+    if (!profile || busy) return;
 
     ensureAudio();
 
     document.getElementById("resultCard").style.display = "none";
 
-    markedIndex = null;
+    const target = decode(payload);
+
+    if (!sectors.includes(target)) {
+        sectors.push(target);
+        colors.push(markerColor);
+    }
+
+    marker = null;
     drawWheel();
 
-    active = true;
+    busy = true;
 
-    const selectedIndex = sectors.indexOf(specialTarget);
+    const selectedIndex = sectors.indexOf(target);
 
     const sectorAngle = 360 / sectors.length;
     const pointerAngle = 270;
@@ -818,7 +821,7 @@ function runSequence() {
         if (progress < 1) {
             requestAnimationFrame(animate);
         } else {
-            active = false;
+            busy = false;
             finish();
         }
     }
