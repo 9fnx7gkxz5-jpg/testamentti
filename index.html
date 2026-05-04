@@ -55,7 +55,9 @@ body::before {
 h1 {
     margin: 0;
     font-size: clamp(34px, 6vw, 68px);
-    text-shadow: 0 0 12px rgba(255,255,255,0.65), 0 0 30px rgba(255,75,43,0.75);
+    text-shadow:
+        0 0 12px rgba(255,255,255,0.65),
+        0 0 30px rgba(255,75,43,0.75);
 }
 
 .subtitle {
@@ -83,7 +85,9 @@ h1 {
     border-radius: 34px;
     background: rgba(255,255,255,0.10);
     border: 1px solid rgba(255,255,255,0.22);
-    box-shadow: 0 30px 90px rgba(0,0,0,0.42), inset 0 0 45px rgba(255,255,255,0.06);
+    box-shadow:
+        0 30px 90px rgba(0,0,0,0.42),
+        inset 0 0 45px rgba(255,255,255,0.06);
     backdrop-filter: blur(10px);
 }
 
@@ -103,7 +107,9 @@ h1 {
     height: 104%;
     border-radius: 50%;
     background: conic-gradient(#fff6b7, #f7b733, #fff1a8, #d98b00, #fff6b7);
-    box-shadow: 0 0 35px rgba(255,215,0,0.75), 0 0 90px rgba(255,65,108,0.28);
+    box-shadow:
+        0 0 35px rgba(255,215,0,0.75),
+        0 0 90px rgba(255,65,108,0.28);
     z-index: 0;
 }
 
@@ -140,7 +146,9 @@ canvas {
     height: 100%;
     border-radius: 50%;
     background: white;
-    box-shadow: inset 0 0 22px rgba(0,0,0,0.35), 0 18px 55px rgba(0,0,0,0.55);
+    box-shadow:
+        inset 0 0 22px rgba(0,0,0,0.35),
+        0 18px 55px rgba(0,0,0,0.55);
 }
 
 #pointer {
@@ -162,9 +170,12 @@ canvas {
     width: min(34vw, 170px);
     height: min(34vw, 170px);
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #fff 0%, #ffe39a 25%, #f7b733 58%, #b76800 100%);
+    background:
+        radial-gradient(circle at 35% 30%, #fff 0%, #ffe39a 25%, #f7b733 58%, #b76800 100%);
     border: 5px solid rgba(255,255,255,0.75);
-    box-shadow: 0 0 22px rgba(255,215,0,0.8), inset 0 0 18px rgba(255,255,255,0.65);
+    box-shadow:
+        0 0 22px rgba(255,215,0,0.8),
+        inset 0 0 18px rgba(255,255,255,0.65);
     pointer-events: none;
 }
 
@@ -179,7 +190,13 @@ button {
     color: white;
     border: none;
     border-radius: 999px;
-    box-shadow: 0 12px 28px rgba(255,65,108,0.45), 0 0 28px rgba(255,204,0,0.35);
+    box-shadow:
+        0 12px 28px rgba(255,65,108,0.45),
+        0 0 28px rgba(255,204,0,0.35);
+}
+
+button:hover {
+    transform: scale(1.04);
 }
 
 @keyframes buttonGlow {
@@ -191,14 +208,17 @@ button {
 #overlay {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle, rgba(255,204,0,0.22), rgba(0,0,0,0.92));
+    background:
+        radial-gradient(circle, rgba(255,204,0,0.22), rgba(0,0,0,0.92));
     display: none;
     align-items: center;
     justify-content: center;
     font-size: clamp(38px, 8vw, 90px);
     font-weight: 900;
     z-index: 10;
-    text-shadow: 0 0 18px white, 0 0 40px #ff416c;
+    text-shadow:
+        0 0 18px white,
+        0 0 40px #ff416c;
 }
 
 #resultCard {
@@ -208,7 +228,8 @@ button {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    background: radial-gradient(circle at center, rgba(255,204,0,0.22), rgba(0,0,0,0.92));
+    background:
+        radial-gradient(circle at center, rgba(255,204,0,0.22), rgba(0,0,0,0.92));
     font-size: 28px;
     z-index: 20;
 }
@@ -219,7 +240,9 @@ button {
     padding: 36px;
     border-radius: 26px;
     width: min(88vw, 620px);
-    box-shadow: 0 0 40px rgba(255,215,0,0.8), 0 30px 90px rgba(0,0,0,0.65);
+    box-shadow:
+        0 0 40px rgba(255,215,0,0.8),
+        0 30px 90px rgba(0,0,0,0.65);
 }
 
 #resultText b {
@@ -250,6 +273,84 @@ button {
     50% { transform: translateX(7px); }
     75% { transform: translateX(-4px); }
     100% { transform: translateX(0); }
+}
+
+/* DEV MODE */
+#devPanel {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    width: 300px;
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(0,0,0,0.82);
+    color: #00ff99;
+    border: 1px solid rgba(0,255,153,0.55);
+    box-shadow: 0 0 25px rgba(0,255,153,0.35);
+    font-family: monospace;
+    text-align: left;
+    display: none;
+    z-index: 60;
+}
+
+#devPanel h3 {
+    margin: 0 0 10px;
+}
+
+#devPanel p {
+    line-height: 1.45;
+    font-size: 13px;
+}
+
+#devPanel select {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    font-family: monospace;
+}
+
+#devPanel button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+}
+
+.dev-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 34px;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.86);
+    color: #00ff99;
+    border: 1px solid rgba(0,255,153,0.55);
+    padding: 16px 22px;
+    border-radius: 999px;
+    font-family: monospace;
+    box-shadow: 0 0 24px rgba(0,255,153,0.35);
+    z-index: 70;
+    display: none;
+}
+
+@media (max-width: 620px) {
+    .game-area {
+        padding: 16px;
+        border-radius: 24px;
+    }
+
+    button {
+        font-size: 18px;
+        padding: 14px 26px;
+    }
+
+    #devPanel {
+        left: 12px;
+        right: 12px;
+        width: auto;
+    }
 }
 </style>
 </head>
@@ -286,8 +387,20 @@ button {
     <button onclick="location.reload()">Pyöräytä uudelleen</button>
 </div>
 
+<div id="devPanel">
+    <h3>🛠️ Developer Mode</h3>
+    <p id="devInfo">Debug info</p>
+
+    <label for="cheatSelect">Cheat spin:</label>
+    <select id="cheatSelect"></select>
+
+    <button onclick="cheatSpin()">🎯 Cheat spin</button>
+</div>
+
+<div id="devToast" class="dev-toast">Developer Mode unlocked 🛠️</div>
+
 <script>
-const sectors = [
+let sectors = [
     "Suomen Punainen Risti",
     "WWF Suomi",
     "Pelastakaa Lapset",
@@ -300,18 +413,33 @@ const sectors = [
     "Vihreät"
 ];
 
-const colors = [
-    "#FF1744", "#00BFA6", "#FFD600", "#2979FF", "#FF9100",
-    "#7C4DFF", "#00C853", "#D500F9", "#00B0FF", "#64DD17"
+let colors = [
+    "#FF1744",
+    "#00BFA6",
+    "#FFD600",
+    "#2979FF",
+    "#FF9100",
+    "#7C4DFF",
+    "#00C853",
+    "#D500F9",
+    "#00B0FF",
+    "#64DD17"
 ];
+
+const hiddenSector = "Tietoaika Oy:n virkistyskassa";
+const hiddenSectorColor = "#00FF99";
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
 let angle = 0;
-const arc = (2 * Math.PI) / sectors.length;
+let arc = (2 * Math.PI) / sectors.length;
+let isSpinning = false;
+let developerMode = false;
 
 function drawWheel() {
+    arc = (2 * Math.PI) / sectors.length;
+
     ctx.clearRect(0, 0, 500, 500);
 
     for (let i = 0; i < sectors.length; i++) {
@@ -328,6 +456,12 @@ function drawWheel() {
         ctx.lineWidth = 4;
         ctx.stroke();
 
+        const gradient = ctx.createRadialGradient(250, 250, 40, 250, 250, 240);
+        gradient.addColorStop(0, "rgba(255,255,255,0.28)");
+        gradient.addColorStop(1, "rgba(0,0,0,0.12)");
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
         ctx.save();
         ctx.translate(250, 250);
         ctx.rotate(start + arc / 2);
@@ -335,7 +469,7 @@ function drawWheel() {
         ctx.fillStyle = "white";
         ctx.strokeStyle = "rgba(0,0,0,0.58)";
         ctx.lineWidth = 4;
-        ctx.font = "900 12px Arial";
+        ctx.font = sectors.length > 10 ? "900 11px Arial" : "900 12px Arial";
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
 
@@ -345,7 +479,9 @@ function drawWheel() {
 
         words.forEach(word => {
             const testLine = line ? line + " " + word : word;
-            if (ctx.measureText(testLine).width > 138 && line) {
+            const maxWidth = sectors.length > 10 ? 128 : 138;
+
+            if (ctx.measureText(testLine).width > maxWidth && line) {
                 lines.push(line);
                 line = word;
             } else {
@@ -355,7 +491,7 @@ function drawWheel() {
 
         lines.push(line);
 
-        const lineHeight = 14;
+        const lineHeight = sectors.length > 10 ? 13 : 14;
         const startY = -((lines.length - 1) * lineHeight) / 2;
 
         lines.forEach((lineText, index) => {
@@ -401,7 +537,7 @@ function playTick() {
     o.frequency.value = 900;
     o.type = "square";
 
-    g.gain.setValueAtTime(0.05, ctxAudio.currentTime);
+    g.gain.setValueAtTime(0.045, ctxAudio.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.045);
 
     o.start();
@@ -434,6 +570,8 @@ function fanfare() {
 }
 
 function startShow() {
+    if (isSpinning) return;
+
     ensureAudio();
 
     const overlay = document.getElementById("overlay");
@@ -446,6 +584,8 @@ function startShow() {
 }
 
 function spin() {
+    isSpinning = true;
+
     let velocity = 38 + Math.random() * 18;
     let tickCounter = 0;
 
@@ -464,6 +604,7 @@ function spin() {
         if (velocity > 0.45) {
             requestAnimationFrame(animate);
         } else {
+            isSpinning = false;
             stop();
         }
     }
@@ -471,16 +612,23 @@ function spin() {
     animate();
 }
 
-function stop() {
-    fanfare();
-
-    document.querySelector(".game-area").classList.add("shake");
-
+function getWinningIndex() {
     const normalizedAngle = ((angle % 360) + 360) % 360;
     const pointerAngle = 270;
     const sectorAngle = 360 / sectors.length;
     const winningAngle = (pointerAngle - normalizedAngle + 360) % 360;
-    const index = Math.floor(winningAngle / sectorAngle) % sectors.length;
+
+    return Math.floor(winningAngle / sectorAngle) % sectors.length;
+}
+
+function stop() {
+    fanfare();
+
+    document.querySelector(".game-area").classList.remove("shake");
+    void document.querySelector(".game-area").offsetWidth;
+    document.querySelector(".game-area").classList.add("shake");
+
+    const index = getWinningIndex();
 
     setTimeout(() => {
         showResult(sectors[index]);
@@ -508,6 +656,148 @@ function confetti() {
 
         setTimeout(() => c.remove(), 5200);
     }
+}
+
+/* KONAMI CODE + DEV MODE */
+const konamiCode = [
+    "ArrowUp", "ArrowUp",
+    "ArrowDown", "ArrowDown",
+    "ArrowLeft", "ArrowRight",
+    "ArrowLeft", "ArrowRight",
+    "b", "a"
+];
+
+let konamiIndex = 0;
+
+document.addEventListener("keydown", (e) => {
+    const key = e.key;
+
+    if (key === konamiCode[konamiIndex]) {
+        konamiIndex++;
+
+        if (konamiIndex === konamiCode.length) {
+            activateDeveloperMode();
+            konamiIndex = 0;
+        }
+    } else {
+        konamiIndex = 0;
+    }
+});
+
+function activateDeveloperMode() {
+    if (developerMode) return;
+
+    developerMode = true;
+
+    console.log("%c🛠️ Developer Mode Activated", "color:#00ff99; font-size:18px; font-weight:bold;");
+    console.log("Hidden sector unlocked:", hiddenSector);
+    console.log("There is no randomness. Only JavaScript.");
+
+    sectors.push(hiddenSector);
+    colors.push(hiddenSectorColor);
+
+    drawWheel();
+    populateCheatSelect();
+
+    document.getElementById("devPanel").style.display = "block";
+
+    const toast = document.getElementById("devToast");
+    toast.style.display = "block";
+
+    document.body.style.filter = "hue-rotate(180deg) contrast(1.18)";
+
+    setTimeout(() => {
+        document.body.style.filter = "";
+        toast.style.display = "none";
+    }, 1500);
+
+    updateDevInfo();
+}
+
+function populateCheatSelect() {
+    const select = document.getElementById("cheatSelect");
+    select.innerHTML = "";
+
+    sectors.forEach((sector, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${index}: ${sector}`;
+        select.appendChild(option);
+    });
+}
+
+function updateDevInfo() {
+    if (!developerMode) return;
+
+    const normalizedAngle = ((angle % 360) + 360) % 360;
+    const sectorAngle = 360 / sectors.length;
+    const index = getWinningIndex();
+
+    document.getElementById("devInfo").innerHTML = `
+        Angle: ${normalizedAngle.toFixed(2)}°<br>
+        Sector angle: ${sectorAngle.toFixed(2)}°<br>
+        Current index: ${index}<br>
+        Current sector:<br><strong>${sectors[index]}</strong>
+    `;
+
+    requestAnimationFrame(updateDevInfo);
+}
+
+function cheatSpin() {
+    if (!developerMode || isSpinning) return;
+
+    ensureAudio();
+
+    const resultCard = document.getElementById("resultCard");
+    resultCard.style.display = "none";
+
+    isSpinning = true;
+
+    const selectedIndex = Number(document.getElementById("cheatSelect").value);
+
+    const sectorAngle = 360 / sectors.length;
+    const pointerAngle = 270;
+
+    const targetSectorCenter = selectedIndex * sectorAngle + sectorAngle / 2;
+    const targetNormalizedAngle = (pointerAngle - targetSectorCenter + 360) % 360;
+
+    const currentNormalizedAngle = ((angle % 360) + 360) % 360;
+    const delta = (targetNormalizedAngle - currentNormalizedAngle + 360) % 360;
+
+    const extraRounds = 6 + Math.floor(Math.random() * 3);
+    const targetAngle = angle + extraRounds * 360 + delta;
+
+    const startAngle = angle;
+    const duration = 4600;
+    const startTime = performance.now();
+
+    function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+    }
+
+    let lastTickAngle = angle;
+
+    function animate(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = easeOutCubic(progress);
+
+        angle = startAngle + (targetAngle - startAngle) * eased;
+        canvas.style.transform = `rotate(${angle}deg)`;
+
+        if (Math.abs(angle - lastTickAngle) > sectorAngle / 2) {
+            playTick();
+            lastTickAngle = angle;
+        }
+
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            isSpinning = false;
+            stop();
+        }
+    }
+
+    requestAnimationFrame(animate);
 }
 </script>
 
